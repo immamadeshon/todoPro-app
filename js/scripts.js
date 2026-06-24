@@ -32,9 +32,26 @@
     p.classList.add('item');
     p.textContent = taskText;
 
+    const editBtn = document.createElement("button");
+    editBtn.classList.add("edit");
+    const editImg = document.createElement("img");
+    editImg.setAttribute("src","./assets/images/icons8-edit-96.png");
+    editImg.setAttribute("class","edit-img");
+    editImg.setAttribute("alt", "Edit It");
+    
+    const clearBtn = document.createElement("button");
+    clearBtn.classList.add("clear");
+    const img = document.createElement("img");
+    img.setAttribute("src", "./assets/images/icon-cross.svg");
+    img.setAttribute("alt", "Clear It");
+
     li.appendChild(cbContainer);
     li.appendChild(p);
-
+    li.appendChild(editBtn);
+    li.appendChild(clearBtn);
+    editBtn.appendChild(editImg);
+    clearBtn.appendChild(img);
+    
     // افزودن به لیست
     todosContainer.appendChild(li);
 
