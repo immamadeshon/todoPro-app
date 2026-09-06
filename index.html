@@ -8,54 +8,77 @@
   <title>TODO App</title>
 </head>
 
-<body >
+<body>
   <header class="card">
     <h1>لیست وظایف </h1>
-    
+
   </header>
   <main>
     <div class="card add">
       <div class="cb-container">
-        <button id="add-btn">+</button>
+        <button id="add-btn" data-bind="click: addTodo">+</button>
       </div>
       <div class="txt-container">
         <label for="addt">افزودن </label>
-        <input type="text" class="txt-input" placeholder="افزودن وظیفه جدید..." s
-          id="addt" dir="rtl" />
+        <input
+          type="text"
+          class="txt-input"
+          placeholder="افزودن وظیفه جدید..."
+          id="addt"
+          dir="rtl"
+          data-bind="textInput: newTodoText, event: { keypress: addOnEnter }"
+        />
       </div>
     </div>
-    <ul class="todos">
 
-      <!-- <li class="card todo">
+    <ul class="todos" data-bind="attr: { class: 'todos ' + currentFilter() }, foreach: filteredTodos">
+      <li class="card todo" data-bind="css: { checked: completed(), 'in-edit': editing() }">
         <div class="cb-container">
-          <input type="checkbox" class="cb-input" />
+          <input type="checkbox" class="cb-input" data-bind="checked: completed" />
           <span class="check"></span>
         </div>
-        <p class="item todo-text">یادگیری جاوااسکریپت</p>
-        <button class="clear">
+
+        <!-- نمایش متن وظیفه (دابل کلیک برای کپی) -->
+        <p class="item todo-text"
+          data-bind="text: text, visible: !editing(), event: { dblclick: $parent.copyText },
+           style: { textDecoration: completed() ? 'line-through' : 'none', opacity: completed() ? '0.6' : '1' }"
+        ></p>
+
+        <!-- اینپوت ویرایش (فقط وقتی در حالت ویرایش هستیم نمایش داده می‌شود) -->
+        <input
+          type="text"
+          class="item todo-text"
+          style="display:none;"
+          data-bind="visible: editing, textInput: text, hasFocus: editing,
+           event: { blur: $parent.stopEdit, keypress: $parent.stopEditOnEnter }"
+        />
+
+        <button class="edit-btn" data-bind="click: $parent.startEdit">
+          <img src="./assets/images/icons8-edit-96.png" class="edit-img" alt="Edit It" />
+        </button>
+
+        <button class="clear" data-bind="click: $parent.removeTodo">
           <img src="./assets/images/icon-cross.svg" alt="Clear it" />
         </button>
-        <button class="edit-btn">
-          <img src="./assets/images/icons8-edit-96.png" class="edit-img" alt="Edit It">
-        </button>
-      </li> -->
-      
+      </li>
     </ul>
-    
+
     <div class="card stat">
-      <p class="corner"><span id="items-left">0</span> مورد باقی مانده</p>
+      <p class="corner"><span data-bind="text: itemsLeft"></span> مورد باقی مانده</p>
       <div class="filter">
-        <button id="all" class="on">همه</button>
-        <button id="active" >فعال</button>
-        <button id="completed">تکمیل</button>
+        <button id="all" class="on" data-bind="css: { on: currentFilter() === 'all' }, click: function() { setFilter('all') }">همه</button>
+        <button id="active" data-bind="css: { on: currentFilter() === 'active' }, click: function() { setFilter('active') }">فعال</button>
+        <button id="completed" data-bind="css: { on: currentFilter() === 'completed' }, click: function() { setFilter('completed') }">تکمیل</button>
       </div>
       <div class="corner">
-        <button id="clear-completed">حذف تکمیل شده ها</button>
+        <button id="clear-completed" data-bind="click: clearCompleted">حذف تکمیل شده ها</button>
       </div>
     </div>
 
   </main>
-  <script src="./js/scripts.js"></script>
-</body>
 
+ 
+  <script src="js/knockout-3.5.3.js"></script>
+  <script src="js/app.js"></script>
+</body>
 </html>
