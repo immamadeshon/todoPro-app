@@ -75,6 +75,16 @@
       </div>
     </div>
 
+    <!-- ارسال / دریافت وضعیت از سرور -->
+    <div class="card sync">
+      <div class="sync-actions">
+        <button id="upload-btn" data-bind="click: uploadState, disable: isSyncing"> ارسال به سرور</button>
+        <button id="download-btn" data-bind="click: downloadState, disable: isSyncing"> دریافت از سرور</button>
+      </div>
+      <p class="sync-status" role="status" aria-live="polite"
+        data-bind="text: statusMessage, css: statusType, visible: statusMessage"></p>
+    </div>
+
   </main>
 
  

@@ -237,7 +237,6 @@ header.card h1 {
 /* STAT CONTAINER */
 
 .stat {
-  border-radius: 0 0 0.5rem 0.5rem;
   border-top: 0.2rem solid var(--clr-gb-6);
   font-size: calc(var(--base-font) - 0.3rem);
   display: grid;
@@ -377,3 +376,56 @@ header.card h1 {
   opacity: 1 !important;
   pointer-events: all !important;
 }
+
+/* upload/download part */
+
+.card.sync {
+  display: flex;
+  flex-direction: column;
+  border-radius: 0 0 0.5rem 0.5rem;
+  gap: 10px;
+  padding: 14px 20px;
+}
+
+.sync-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.sync-actions button {
+  flex: 1 0 140px;
+  justify-content: center;
+  padding: 10px;
+  border: 1px solid var(--clr-gb-6);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--clr-gb-2);
+  font: inherit;
+  cursor: pointer;
+  opacity: 0.85;
+  transition: opacity 0.15s, transform 0.1s;
+}
+
+.sync-actions button:hover:not(:disabled) {
+  opacity: 1;
+}
+
+.sync-actions button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.sync-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.sync-status {
+  margin: 0;
+  text-align: center;
+  font-size: 14px;
+}
+
+.sync-status.success { color: #2e9e5b; }
+.sync-status.error   { color: #d64545; }
+.sync-status.info    { color: #8a8fa8; }

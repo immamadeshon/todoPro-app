@@ -1,0 +1,13 @@
+{
+  "name": "todopro-app",
+  "version": "1.0.0",
+  "description": "Todo App (Knockout.js) with localStorage and server sync",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=16"
+  },
+  "license": "MIT"
+}
