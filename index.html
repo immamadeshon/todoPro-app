@@ -5,13 +5,24 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="./css/styles.css" />
+  <link rel="stylesheet" href="./css/sync.css" />
+  <link rel="stylesheet" href="./css/auth.css" />
   <title>TODO App</title>
+
+  <!-- محافظ صفحه: اگر کاربر وارد نشده باشد، قبل از نمایش صفحه به signin.html می‌رود -->
+  <script src="./js/auth.js"></script>
+  <script>Auth.requireLogin();</script>
 </head>
 
 <body>
   <header class="card">
     <h1>لیست وظایف </h1>
 
+    <!-- نام کاربر فعلی و دکمه‌ی خروج -->
+    <div class="user-bar">
+      <span class="usrr"> کاربر <strong class="usr" data-bind="text: username"></strong></span>
+      <button id="signout-btn" type="button" data-bind="click: signOut">خروج</button>
+    </div>
   </header>
   <main>
     <div class="card add">
@@ -78,8 +89,8 @@
     <!-- ارسال / دریافت وضعیت از سرور -->
     <div class="card sync">
       <div class="sync-actions">
-        <button id="upload-btn" data-bind="click: uploadState, disable: isSyncing"> ارسال به سرور</button>
-        <button id="download-btn" data-bind="click: downloadState, disable: isSyncing"> دریافت از سرور</button>
+        <button id="upload-btn" data-bind="click: uploadState, disable: isSyncing">ارسال به سرور</button>
+        <button id="download-btn" data-bind="click: downloadState, disable: isSyncing">دریافت از سرور</button>
       </div>
       <p class="sync-status" role="status" aria-live="polite"
         data-bind="text: statusMessage, css: statusType, visible: statusMessage"></p>

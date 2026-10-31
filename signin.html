@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="./css/styles.css" />
+  <link rel="stylesheet" href="./css/auth.css" />
+  <title>ورود | TODO App</title>
+</head>
+
+<body>
+  <header class="card">
+    <h1>ورود به حساب</h1>
+  </header>
+
+  <main>
+    <div class="card auth">
+      <form class="auth-form" novalidate data-bind="submit: submit">
+        <!-- پیام اطلاع‌رسانی (مثلاً: نشست منقضی شد) -->
+        <p class="form-message info" role="status" data-bind="text: infoMessage, visible: infoMessage"></p>
+
+        <div class="field">
+          <label for="username">نام کاربری</label>
+          <input id="username" type="text" dir="ltr" autocomplete="username" autocapitalize="none"
+            spellcheck="false" autofocus data-bind="textInput: username" placeholder="نام کاربری" />
+        </div>
+
+        <div class="field">
+          <label for="password">رمز عبور</label>
+          <input id="password" type="password" dir="ltr" autocomplete="current-password"
+            data-bind="textInput: password" placeholder="رمز ورود" />
+        </div>
+
+        <!-- پیام خطا (مثلاً: رمز اشتباه است) -->
+        <p class="form-message error" role="alert" data-bind="text: errorMessage, visible: errorMessage"></p>
+
+        <button type="submit" class="auth-submit"
+          data-bind="disable: isLoading, text: isLoading() ? 'در حال ورود...' : 'ورود'"></button>
+      </form>
+
+      <p class="auth-switch">حساب کاربری ندارید؟ <a href="signup.html">ایجاد حساب</a></p>
+    </div>
+  </main>
+
+  <script src="./js/auth.js"></script>
+  <script src="./js/knockout-3.5.3.js"></script>
+  <script src="./js/signin.js"></script>
+</body>
+</html>

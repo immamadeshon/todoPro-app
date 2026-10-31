@@ -8,12 +8,17 @@ function Todo(text, completed) {
 }
 
 // ===== تنظیمات =====
-var STORAGE_KEY = 'todo-app-state-v1';
+var STORAGE_KEY_PREFIX = 'todo-app-state-v1:';
 var VALID_FILTERS = ['all', 'active', 'completed'];
 
-// آدرس API سرور. اگر صفحه را با سرور خودِ پروژه (node server.js) باز کنید همین مقدار درست است.
-// اگر صفحه را با Live Server (پورت دیگر) باز می‌کنید، این را بکنید: 'http://localhost:3000/api/state'
-var API_URL = 'http://localhost:3000/api/state';
+// مسیر API وضعیت. آدرس پایه‌ی سرور (API_BASE) و هدر توکن را Auth.fetch در js/auth.js اضافه می‌کند.
+var API_PATH = '/api/state';
+
+// کلید localStorage برای هر کاربر جداست؛ تا اگر چند نفر روی یک مرورگر وارد شوند، لیست‌هایشان قاطی نشود
+function storageKey() {
+  var user = Auth.getUser();
+  return STORAGE_KEY_PREFIX + (user ? user.id : 'anonymous');
+}
 
 // ===== اعتبارسنجی و تبدیل داده به مدل =====
 // داده‌ی خام (از localStorage یا سرور) را بررسی می‌کند و به آبجکت‌های Todo تبدیل می‌کند.
@@ -34,7 +39,7 @@ function normalizeState(data) {
 function loadState() {
   var fallback = { todos: [], currentFilter: 'all' };
   try {
-    var raw = localStorage.getItem(STORAGE_KEY);
+    var raw = localStorage.getItem(storageKey());
     if (!raw) return fallback;
     return normalizeState(JSON.parse(raw)) || fallback;
   } catch (e) {
@@ -45,8 +50,9 @@ function loadState() {
 
 // نوشتن وضعیت در localStorage (وضعیت «در حال ویرایش» عمداً ذخیره نمی‌شود)
 function saveState(state) {
+  if (!Auth.getUser()) return; // بدون کاربر واردشده (مثلاً بعد از انقضای نشست) چیزی ذخیره نمی‌کنیم
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    localStorage.setItem(storageKey(), JSON.stringify(state));
   } catch (e) {
     console.warn('Could not save todos:', e);
   }
@@ -169,6 +175,13 @@ function TodoListViewModel() {
     saveState(getCurrentState());
   });
 
+  // ===== کاربر فعلی و خروج =====
+  self.username = Auth.getUser().username;
+
+  self.signOut = function () {
+    Auth.signOut(); // پاک کردن توکن و رفتن به صفحه‌ی ورود (لیست محلی هر کاربر در مرورگر می‌ماند)
+  };
+
   // ===== همگام‌سازی با سرور (Upload / Download) =====
 
   // در حال ارسال/دریافت؟ (برای غیرفعال کردن دکمه‌ها و جلوگیری از درخواست تکراری)
@@ -216,7 +229,7 @@ function TodoListViewModel() {
     self.isSyncing(true);
     setStatus('در حال ارسال به سرور...', 'info');
 
-    fetch(API_URL, {
+    Auth.fetch(API_PATH, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(getCurrentState())
@@ -248,7 +261,7 @@ function TodoListViewModel() {
     self.isSyncing(true);
     setStatus('در حال دریافت از سرور...', 'info');
 
-    fetch(API_URL)
+    Auth.fetch(API_PATH)
       .then(function (res) {
         return res.ok ? res.json() : httpError(res);
       })
@@ -271,4 +284,10 @@ function TodoListViewModel() {
 }
 
 // ===== فعال‌سازی Knockout روی صفحه =====
-ko.applyBindings(new TodoListViewModel());
+// فقط برای کاربر واردشده؛ در غیر این صورت Auth.requireLogin (در head) او را به صفحه‌ی ورود برده است
+if (Auth.isLoggedIn()) {
+  ko.applyBindings(new TodoListViewModel());
+
+  // اعتبار توکن را با سرور چک می‌کنیم (اگر منقضی شده باشد به صفحه‌ی ورود می‌رود)
+  Auth.verifySession();
+}

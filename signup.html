@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="./css/styles.css" />
+  <link rel="stylesheet" href="./css/auth.css" />
+  <title>ثبت‌نام | TODO App</title>
+</head>
+
+<body>
+  <header class="card">
+    <h1>ساخت حساب جدید</h1>
+  </header>
+
+  <main>
+    <div class="card auth">
+      <form class="auth-form" novalidate data-bind="submit: submit">
+        <div class="field">
+          <label for="username">نام کاربری</label>
+          <input id="username" type="text" dir="ltr" autocomplete="username" autocapitalize="none"
+            spellcheck="false" autofocus data-bind="textInput: username" placeholder="نام کاربری" />
+          <p class="hint">حداقل ۳ و حداکثر ۳۰ کاراکتر انگلیسی</p>
+          <p class="field-error" data-bind="text: usernameError, visible: showErrors() && usernameError()"></p>
+        </div>
+
+        <div class="field">
+          <label for="password">رمز عبور</label>
+          <input id="password" type="password" dir="ltr" autocomplete="new-password"
+            data-bind="textInput: password" placeholder="رمز عبور" />
+          <p class="hint">حداقل ۸ کاراکتر</p>
+          <p class="field-error" data-bind="text: passwordError, visible: showErrors() && passwordError()"></p>
+        </div>
+
+        <div class="field">
+          <label for="confirm">تکرار رمز عبور</label>
+          <input id="confirm" type="password" dir="ltr" autocomplete="new-password"
+            data-bind="textInput: confirmPassword" placeholder="تکرار رمز عبور" />
+          <p class="field-error" data-bind="text: confirmError, visible: showErrors() && confirmError()"></p>
+        </div>
+
+        <!-- خطاهای سمت سرور (مثلاً: نام کاربری تکراری است) -->
+        <p class="form-message error" role="alert" data-bind="text: errorMessage, visible: errorMessage"></p>
+
+        <button type="submit" class="auth-submit"
+          data-bind="disable: isLoading, text: isLoading() ? 'در حال ثبت‌نام...' : 'ثبت‌نام'"></button>
+      </form>
+
+      <p class="auth-switch">حساب کاربری دارید؟<a href="signin.html"> ورود به حساب</a></p>
+    </div>
+  </main>
+
+  <script src="./js/auth.js"></script>
+  <script src="./js/knockout-3.5.3.js"></script>
+  <script src="./js/signup.js"></script>
+</body>
+</html>
