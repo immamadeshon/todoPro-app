@@ -5,23 +5,36 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="./css/styles.css" />
-  <link rel="stylesheet" href="./css/sync.css" />
   <link rel="stylesheet" href="./css/auth.css" />
   <title>TODO App</title>
 
-  <!-- محافظ صفحه: اگر کاربر وارد نشده باشد، قبل از نمایش صفحه به signin.html می‌رود -->
+  <!-- تنظیمات و ماژول احراز هویت (برنامه برای مهمان هم کار می‌کند؛ ورود اجباری نیست) -->
+  <script src="./js/config.js"></script>
   <script src="./js/auth.js"></script>
-  <script>Auth.requireLogin();</script>
 </head>
 
 <body>
   <header class="card">
     <h1>لیست وظایف </h1>
 
-    <!-- نام کاربر فعلی و دکمه‌ی خروج -->
-    <div class="user-bar">
-      <span class="usrr"> کاربر <strong class="usr" data-bind="text: username"></strong></span>
+    <!-- کاربر واردشده: نام کاربر و دکمه‌ی خروج -->
+    <div class="user-bar" data-bind="visible: isLoggedIn">
+      <span>کاربر: <strong data-bind="text: username"></strong></span>
       <button id="signout-btn" type="button" data-bind="click: signOut">خروج</button>
+    </div>
+
+    <!-- مهمان (وارد نشده): لینک‌های ورود و ثبت‌نام -->
+    <div class="user-bar guest-bar" data-bind="visible: isGuest && serverEnabled">
+      <span>Guest</span>
+      <span class="guest-links">
+        <a id="signin-link" href="signin.html">ورود</a>
+        <a id="signup-link" href="signup.html">ثبت‌نام</a>
+      </span>
+    </div>
+
+    <!-- نسخه‌ی بدون سرور (مثلاً GitHub Pages) -->
+    <div class="user-bar guest-bar" id="no-server-note" data-bind="visible: !serverEnabled">
+      <span>نسخه‌ی نمایشی: وظایف فقط روی همین مرورگر ذخیره می‌شوند.</span>
     </div>
   </header>
   <main>
@@ -86,8 +99,8 @@
       </div>
     </div>
 
-    <!-- ارسال / دریافت وضعیت از سرور -->
-    <div class="card sync">
+    <!-- ارسال / دریافت وضعیت از سرور (فقط برای کاربر واردشده) -->
+    <div class="card sync" data-bind="visible: canSync">
       <div class="sync-actions">
         <button id="upload-btn" data-bind="click: uploadState, disable: isSyncing">ارسال به سرور</button>
         <button id="download-btn" data-bind="click: downloadState, disable: isSyncing">دریافت از سرور</button>

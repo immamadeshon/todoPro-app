@@ -2,6 +2,9 @@
 function SignInViewModel() {
   var self = this;
 
+  // آیا سرور در دسترس است؟ (روی GitHub Pages نه؛ آنجا فرم مخفی و پیام توضیحی نمایش داده می‌شود)
+  self.serverEnabled = Auth.serverEnabled;
+
   self.username = ko.observable('');
   self.password = ko.observable('');
   self.errorMessage = ko.observable('');

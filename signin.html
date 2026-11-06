@@ -16,7 +16,12 @@
 
   <main>
     <div class="card auth">
-      <form class="auth-form" novalidate data-bind="submit: submit">
+      <!-- نسخه‌ی بدون سرور (مثلاً GitHub Pages): ورود و ثبت‌نام در دسترس نیست -->
+      <p class="form-message info" id="no-server-message" data-bind="visible: !serverEnabled">
+        در این نسخه سرور وجود ندارد، پس ورود و ثبت‌نام فعال نیست. می‌توانید به‌صورت مهمان از برنامه استفاده کنید.
+      </p>
+
+      <form class="auth-form" novalidate data-bind="submit: submit, visible: serverEnabled">
         <!-- پیام اطلاع‌رسانی (مثلاً: نشست منقضی شد) -->
         <p class="form-message info" role="status" data-bind="text: infoMessage, visible: infoMessage"></p>
 
@@ -40,9 +45,11 @@
       </form>
 
       <p class="auth-switch">حساب کاربری ندارید؟ <a href="signup.html">ایجاد حساب</a></p>
+      <p class="auth-switch auth-guest"><a id="guest-link" href="index.html">ادامه به‌صورت مهمان</a></p>
     </div>
   </main>
 
+  <script src="./js/config.js"></script>
   <script src="./js/auth.js"></script>
   <script src="./js/knockout-3.5.3.js"></script>
   <script src="./js/signin.js"></script>

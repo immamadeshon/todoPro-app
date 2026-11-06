@@ -14,9 +14,11 @@ var VALID_FILTERS = ['all', 'active', 'completed'];
 // مسیر API وضعیت. آدرس پایه‌ی سرور (API_BASE) و هدر توکن را Auth.fetch در js/auth.js اضافه می‌کند.
 var API_PATH = '/api/state';
 
-// کلید localStorage برای هر کاربر جداست؛ تا اگر چند نفر روی یک مرورگر وارد شوند، لیست‌هایشان قاطی نشود
-function storageKey() {
-  var user = Auth.getUser();
+// کلید localStorage برای «هر کاربر جداست» و مهمان‌ها هم یک سطل جدا دارند:
+//   کاربر واردشده → todo-app-state-v1:<userId>
+//   مهمان          → todo-app-state-v1:anonymous
+// پس لیست مهمان، لیست هر کاربر و لیست کاربرانِ دیگرِ همین مرورگر هیچ‌وقت قاطی نمی‌شوند.
+function storageKeyFor(user) {
   return STORAGE_KEY_PREFIX + (user ? user.id : 'anonymous');
 }
 
@@ -36,10 +38,10 @@ function normalizeState(data) {
 
 // ===== ذخیره‌سازی سمت کلاینت (localStorage) =====
 // خواندن وضعیت ذخیره‌شده؛ در صورت نبودن یا خراب بودن داده، وضعیت پیش‌فرض برمی‌گردد
-function loadState() {
+function loadState(key) {
   var fallback = { todos: [], currentFilter: 'all' };
   try {
-    var raw = localStorage.getItem(storageKey());
+    var raw = localStorage.getItem(key);
     if (!raw) return fallback;
     return normalizeState(JSON.parse(raw)) || fallback;
   } catch (e) {
@@ -49,10 +51,9 @@ function loadState() {
 }
 
 // نوشتن وضعیت در localStorage (وضعیت «در حال ویرایش» عمداً ذخیره نمی‌شود)
-function saveState(state) {
-  if (!Auth.getUser()) return; // بدون کاربر واردشده (مثلاً بعد از انقضای نشست) چیزی ذخیره نمی‌کنیم
+function saveState(key, state) {
   try {
-    localStorage.setItem(storageKey(), JSON.stringify(state));
+    localStorage.setItem(key, JSON.stringify(state));
   } catch (e) {
     console.warn('Could not save todos:', e);
   }
@@ -62,8 +63,13 @@ function saveState(state) {
 function TodoListViewModel() {
   var self = this;
 
-  // بازیابی آخرین وضعیت ذخیره‌شده
-  var saved = loadState();
+  // کاربر واردشده (یا null برای مهمان). کلید ذخیره‌سازی «یک‌بار» همین‌جا ثابت می‌شود؛
+  // پس حتی اگر نشست وسط کار پاک شود (مثلاً انقضای توکن)، لیست این کاربر هرگز در سطل مهمان نوشته نمی‌شود.
+  var user = Auth.currentUser();
+  var storageKey = storageKeyFor(user);
+
+  // بازیابی آخرین وضعیت ذخیره‌شده‌ی همین کاربر (یا مهمان)
+  var saved = loadState(storageKey);
 
   // متن ورودی وظیفه جدید
   self.newTodoText = ko.observable('');
@@ -172,14 +178,22 @@ function TodoListViewModel() {
   // این computed به آرایه‌ی وظایف، متن و وضعیت تکمیل هر وظیفه و فیلتر وابسته است؛
   // با هر تغییری در هرکدام، خودکار دوباره اجرا می‌شود و وضعیت را ذخیره می‌کند.
   self.persistState = ko.computed(function () {
-    saveState(getCurrentState());
+    saveState(storageKey, getCurrentState());
   });
 
-  // ===== کاربر فعلی و خروج =====
-  self.username = Auth.getUser().username;
+  // ===== وضعیت کاربر (مهمان / واردشده) =====
+  self.isLoggedIn = !!user;
+  self.isGuest = !user;
+  self.username = user ? user.username : '';
+
+  // آیا سرور در دسترس است؟ (روی GitHub Pages نه) — برای نمایش لینک‌های ورود/ثبت‌نام
+  self.serverEnabled = Auth.serverEnabled;
+
+  // همگام‌سازی با سرور فقط برای کاربر واردشده معنا دارد
+  self.canSync = self.isLoggedIn;
 
   self.signOut = function () {
-    Auth.signOut(); // پاک کردن توکن و رفتن به صفحه‌ی ورود (لیست محلی هر کاربر در مرورگر می‌ماند)
+    Auth.signOut(); // پاک کردن توکن و بارگذاری دوباره‌ی برنامه به‌صورت مهمان (لیست کاربر در مرورگر می‌ماند)
   };
 
   // ===== همگام‌سازی با سرور (Upload / Download) =====
@@ -225,6 +239,10 @@ function TodoListViewModel() {
   // ----- Upload: ارسال وضعیت فعلی به سرور -----
   self.uploadState = function () {
     if (self.isSyncing()) return;
+    if (!self.isLoggedIn) {
+      setStatus('برای ذخیره روی سرور ابتدا وارد شوید.', 'error');
+      return;
+    }
 
     self.isSyncing(true);
     setStatus('در حال ارسال به سرور...', 'info');
@@ -251,6 +269,10 @@ function TodoListViewModel() {
   // ----- Download: دریافت آخرین وضعیت ذخیره‌شده از سرور -----
   self.downloadState = function () {
     if (self.isSyncing()) return;
+    if (!self.isLoggedIn) {
+      setStatus('برای دریافت از سرور ابتدا وارد شوید.', 'error');
+      return;
+    }
 
     // دریافت از سرور، لیست فعلی را جایگزین می‌کند؛ پس قبلش تأیید می‌گیریم
     if (self.todos().length > 0 &&
@@ -284,10 +306,10 @@ function TodoListViewModel() {
 }
 
 // ===== فعال‌سازی Knockout روی صفحه =====
-// فقط برای کاربر واردشده؛ در غیر این صورت Auth.requireLogin (در head) او را به صفحه‌ی ورود برده است
-if (Auth.isLoggedIn()) {
-  ko.applyBindings(new TodoListViewModel());
+// برنامه برای همه کار می‌کند: کاربر واردشده با لیست خودش، و مهمان با لیست محلی خودش.
+ko.applyBindings(new TodoListViewModel());
 
-  // اعتبار توکن را با سرور چک می‌کنیم (اگر منقضی شده باشد به صفحه‌ی ورود می‌رود)
+// فقط برای کاربر واردشده: اعتبار توکن را با سرور چک می‌کنیم (اگر منقضی شده باشد به صفحه‌ی ورود می‌رود)
+if (Auth.isLoggedIn()) {
   Auth.verifySession();
 }

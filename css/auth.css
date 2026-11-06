@@ -100,7 +100,7 @@
 }
 
 .auth-switch {
-  margin: 16px 0 0;
+  margin: 17px 0;
   text-align: center;
   font-size: 15px;
   color: #6d6d6f;
@@ -144,4 +144,34 @@
 
 .user-bar button:hover {
   opacity: 1;
+}
+
+/* نوار مهمان و لینک‌های ورود/ثبت‌نام در index.html */
+.user-bar.guest-bar {
+  flex-wrap: wrap;
+}
+
+.user-bar .guest-links {
+  display: flex;
+  gap: 12px;
+}
+
+.user-bar .guest-links a,
+.auth-guest a {
+  color: #3a7bfd;
+  text-decoration: none;
+  font-weight: bold;
+  padding: 5px;
+  border: 1px solid #3a7bfd;
+  border-radius: 8px;
+}
+
+.guest-links a:hover,
+.auth-guest a:hover {
+  background-color: #3a7bfd;
+  color: #25273c;
+}
+
+.auth-guest {
+  margin-top: 8px;
 }

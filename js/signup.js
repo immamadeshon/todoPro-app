@@ -7,6 +7,9 @@ var PASSWORD_MAX = 128;
 function SignUpViewModel() {
   var self = this;
 
+  // آیا سرور در دسترس است؟ (روی GitHub Pages نه؛ آنجا فرم مخفی و پیام توضیحی نمایش داده می‌شود)
+  self.serverEnabled = Auth.serverEnabled;
+
   self.username = ko.observable('');
   self.password = ko.observable('');
   self.confirmPassword = ko.observable('');
