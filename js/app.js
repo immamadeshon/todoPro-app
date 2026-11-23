@@ -11,6 +11,9 @@ function Todo(text, completed) {
 var STORAGE_KEY_PREFIX = 'todo-app-state-v1:';
 var VALID_FILTERS = ['all', 'active', 'completed'];
 
+// نام نمایشی کاربر مهمان در هدر
+var GUEST_DISPLAY_NAME = 'Guest';
+
 // مسیر API وضعیت. آدرس پایه‌ی سرور (API_BASE) و هدر توکن را Auth.fetch در js/auth.js اضافه می‌کند.
 var API_PATH = '/api/state';
 
@@ -181,16 +184,55 @@ function TodoListViewModel() {
     saveState(storageKey, getCurrentState());
   });
 
-  // ===== وضعیت کاربر (مهمان / واردشده) =====
-  self.isLoggedIn = !!user;
-  self.isGuest = !user;
-  self.username = user ? user.username : '';
+  // ===== وضعیت کاربر و هدر برنامه =====
 
-  // آیا سرور در دسترس است؟ (روی GitHub Pages نه) — برای نمایش لینک‌های ورود/ثبت‌نام
+  // کاربر فعلی ({ id, username }) یا null برای مهمان. observable است تا هدر خودکار به‌روز شود
+  // (مثلاً وقتی سرور بعد از بررسی توکن، اطلاعات کاربر را برمی‌گرداند).
+  self.currentUser = ko.observable(user);
+
+  self.isLoggedIn = ko.pureComputed(function () {
+    return !!self.currentUser();
+  });
+  self.isGuest = ko.pureComputed(function () {
+    return !self.isLoggedIn();
+  });
+
+  // آیا سرور در دسترس است؟ (روی GitHub Pages نه) — بدون سرور ورود و ثبت‌نام معنا ندارد
   self.serverEnabled = Auth.serverEnabled;
 
-  // همگام‌سازی با سرور فقط برای کاربر واردشده معنا دارد
+  // ----- برچسب نام نمایشی -----
+  // کاربر واردشده: نام کاربری او  |  مهمان: GUEST_DISPLAY_NAME
+  self.displayName = ko.pureComputed(function () {
+    var u = self.currentUser();
+    return u ? u.username : GUEST_DISPLAY_NAME;
+  });
+
+  // ----- نمایش هر دکمه بر اساس وضعیت برنامه -----
+  //   وضعیت                     | ثبت‌نام | ورود | خروج
+  //   مهمان (سرور در دسترس)     |   ✓     |  ✓   |  ✗
+  //   کاربر واردشده             |   ✗     |  ✗   |  ✓
+  //   مهمان بدون سرور (Pages)   |   ✗     |  ✗   |  ✗
+  self.showSignUp = ko.pureComputed(function () {
+    return self.isGuest() && self.serverEnabled;
+  });
+  self.showSignIn = ko.pureComputed(function () {
+    return self.isGuest() && self.serverEnabled;
+  });
+  self.showSignOut = ko.pureComputed(function () {
+    return self.isLoggedIn();
+  });
+
+  // همگام‌سازی با سرور (Upload/Download) فقط برای کاربر واردشده معنا دارد
   self.canSync = self.isLoggedIn;
+
+  // ----- عملکرد دکمه‌ها -----
+  self.goToSignUp = function () {
+    Auth.navigate('signup.html');
+  };
+
+  self.goToSignIn = function () {
+    Auth.navigate('signin.html');
+  };
 
   self.signOut = function () {
     Auth.signOut(); // پاک کردن توکن و بارگذاری دوباره‌ی برنامه به‌صورت مهمان (لیست کاربر در مرورگر می‌ماند)
@@ -239,7 +281,7 @@ function TodoListViewModel() {
   // ----- Upload: ارسال وضعیت فعلی به سرور -----
   self.uploadState = function () {
     if (self.isSyncing()) return;
-    if (!self.isLoggedIn) {
+    if (!self.isLoggedIn()) {
       setStatus('برای ذخیره روی سرور ابتدا وارد شوید.', 'error');
       return;
     }
@@ -269,7 +311,7 @@ function TodoListViewModel() {
   // ----- Download: دریافت آخرین وضعیت ذخیره‌شده از سرور -----
   self.downloadState = function () {
     if (self.isSyncing()) return;
-    if (!self.isLoggedIn) {
+    if (!self.isLoggedIn()) {
       setStatus('برای دریافت از سرور ابتدا وارد شوید.', 'error');
       return;
     }
@@ -307,9 +349,14 @@ function TodoListViewModel() {
 
 // ===== فعال‌سازی Knockout روی صفحه =====
 // برنامه برای همه کار می‌کند: کاربر واردشده با لیست خودش، و مهمان با لیست محلی خودش.
-ko.applyBindings(new TodoListViewModel());
+var viewModel = new TodoListViewModel();
+ko.applyBindings(viewModel);
 
-// فقط برای کاربر واردشده: اعتبار توکن را با سرور چک می‌کنیم (اگر منقضی شده باشد به صفحه‌ی ورود می‌رود)
+// فقط برای کاربر واردشده: اعتبار توکن را با سرور چک می‌کنیم.
+//   • اگر منقضی شده باشد، Auth.fetch کاربر را به صفحه‌ی ورود می‌برد.
+//   • اگر معتبر باشد، نام کاربر در هدر با اطلاعاتِ سرور به‌روز می‌شود.
 if (Auth.isLoggedIn()) {
-  Auth.verifySession();
+  Auth.verifySession().then(function (data) {
+    if (data && data.user) viewModel.currentUser(data.user);
+  });
 }

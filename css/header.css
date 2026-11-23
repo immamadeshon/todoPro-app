@@ -1,0 +1,105 @@
+/* هدر برنامه: نام نمایشی کاربر + دکمه‌های ثبت‌نام / ورود / خروج
+   از متغیرهای رنگ styles.css استفاده می‌کند، پس بعد از آن لینک شود. */
+
+header.card {
+  flex-wrap: wrap; /* در صفحه‌ی کوچک، بخش کاربر زیر عنوان می‌رود */
+}
+
+.header-user {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.4rem;
+}
+
+/* ----- برچسب نام نمایشی ----- */
+.user-label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--clr-gb-2);
+}
+
+.user-name {
+  max-width: 16rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--clr-white);
+  font-weight: var(--fw-bold);
+}
+
+/* ----- دکمه‌ها ----- */
+.header-actions {
+  display: flex;
+  gap: 0.8rem;
+}
+
+.header-actions button {
+  padding: 0.8rem 1.6rem;
+  border: 0.1rem solid transparent;
+  border-radius: 0.6rem;
+  font-weight: var(--fw-bold);
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+}
+
+.header-actions button:active {
+  transform: scale(0.97);
+}
+
+/* ثبت‌نام و ورود (برای مهمان): دکمه‌ی توخالی آبی */
+.header-actions .btn-outline {
+  border-color: var(--clr-blue);
+  color: var(--clr-blue);
+}
+
+.header-actions .btn-outline:hover {
+  background-color: var(--clr-blue);
+  color: var(--clr-card-bg);
+}
+
+/* خروج (برای کاربر واردشده): دکمه‌ی تیره مثل کارت‌ها */
+.header-actions .btn-solid {
+  border-color: var(--clr-gb-6);
+  background-color: var(--clr-card-bg);
+  color: var(--clr-gb-2);
+}
+
+.header-actions .btn-solid:hover {
+  color: var(--clr-primary);
+}
+
+.header-actions button:focus-visible {
+  outline: 0.2rem solid var(--clr-blue);
+  outline-offset: 0.2rem;
+}
+
+/* ----- یادداشت نسخه‌ی بدون سرور ----- */
+.header-note {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: calc(var(--base-font) - 0.4rem);
+  color: var(--clr-gb-3);
+}
+
+/* ----- صفحه‌ی کوچک: عنوان بالا، بخش کاربر زیر آن و تمام‌عرض ----- */
+@media (max-width: 599px) {
+  header.card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.2rem;
+  }
+
+  .header-user {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+/* صفحه‌ی خیلی کوچک: مثل styles.css هدر وسط‌چین بماند */
+@media (max-width: 340px) {
+  header.card {
+    align-items: center;
+  }
+}

@@ -13,6 +13,7 @@ A Persian (RTL) to-do list built with **Knockout.js** (MVVM), vanilla JavaScript
 - **Works for everyone**
   - **Guests (anonymous):** no sign-in needed; tasks are saved in the browser
   - **Signed-in users:** their own list, separate from guests and from other users on the same browser
+- **Header** with the current user's display name (or *Guest*) and **Sign up**, **Sign in** and **Sign out** buttons – each one is shown only when it makes sense for the current state
 - **Sign up / Sign in** pages with live validation
 - **Upload / Download:** save your list on the server and restore it on any device
 - Token-based authentication (JWT) – the `Authorization` header is added to **every** API request by one wrapper (`Auth.fetch`), and the server protects every `/api/*` route by default
@@ -64,7 +65,9 @@ index.html          main page (works as guest or signed-in)
 signin.html         sign in page
 signup.html         sign up page
 server.js           Node server: static files + auth + per-user state API
-css/                styles
+css/styles.css      main styles
+css/header.css      header (display name + sign up / sign in / sign out buttons)
+css/auth.css        sign in / sign up pages
 js/app.js           Knockout view model for the todo list
 js/auth.js          session, Auth.fetch (adds the token to every request), guards
 js/signin.js        view model of the sign in page

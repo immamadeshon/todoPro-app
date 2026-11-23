@@ -5,7 +5,7 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="./css/styles.css" />
-  <link rel="stylesheet" href="./css/auth.css" />
+  <link rel="stylesheet" href="./css/header.css" />
   <title>TODO App</title>
 
   <!-- تنظیمات و ماژول احراز هویت (برنامه برای مهمان هم کار می‌کند؛ ورود اجباری نیست) -->
@@ -17,24 +17,31 @@
   <header class="card">
     <h1>لیست وظایف </h1>
 
-    <!-- کاربر واردشده: نام کاربر و دکمه‌ی خروج -->
-    <div class="user-bar" data-bind="visible: isLoggedIn">
-      <span>کاربر: <strong data-bind="text: username"></strong></span>
-      <button id="signout-btn" type="button" data-bind="click: signOut">خروج</button>
-    </div>
-
-    <!-- مهمان (وارد نشده): لینک‌های ورود و ثبت‌نام -->
-    <div class="user-bar guest-bar" data-bind="visible: isGuest && serverEnabled">
-      <span>Guest</span>
-      <span class="guest-links">
-        <a id="signin-link" href="signin.html">ورود</a>
-        <a id="signup-link" href="signup.html">ثبت‌نام</a>
+    <!-- هدر کاربر: نام نمایشی + دکمه‌ها (نمایش هر دکمه بر اساس وضعیت برنامه) -->
+    <div class="header-user" role="group" aria-label="حساب کاربری">
+      <span class="user-label">
+        <span class="user-label-title">کاربر:</span>
+        <strong id="display-name" class="user-name" data-bind="text: displayName"></strong>
       </span>
-    </div>
 
-    <!-- نسخه‌ی بدون سرور (مثلاً GitHub Pages) -->
-    <div class="user-bar guest-bar" id="no-server-note" data-bind="visible: !serverEnabled">
-      <span>نسخه‌ی نمایشی: وظایف فقط روی همین مرورگر ذخیره می‌شوند.</span>
+      <div class="header-actions">
+        <!-- مهمان: ثبت‌نام -->
+        <button id="signup-btn" type="button" class="btn-outline" style="display:none;"
+          data-bind="visible: showSignUp, click: goToSignUp">ثبت‌نام</button>
+
+        <!-- مهمان: ورود -->
+        <button id="signin-btn" type="button" class="btn-outline" style="display:none;"
+          data-bind="visible: showSignIn, click: goToSignIn">ورود</button>
+
+        <!-- کاربر واردشده: خروج -->
+        <button id="signout-btn" type="button" class="btn-solid" style="display:none;"
+          data-bind="visible: showSignOut, click: signOut">خروج</button>
+      </div>
+
+      <!-- نسخه‌ی بدون سرور (مثلاً GitHub Pages) -->
+      <p id="no-server-note" class="header-note" style="display:none;" data-bind="visible: !serverEnabled">
+        نسخه‌ی نمایشی: وظایف فقط روی همین مرورگر ذخیره می‌شوند.
+      </p>
     </div>
   </header>
   <main>
